@@ -8,7 +8,9 @@ export default function Home() {
       <h3 className="subtitle">Text to LaTeX conversion</h3>
       <div className="container">
         <div id="div1">
-          <p>Enter Your Input</p>
+          <p>Enter Your Input</p><br></br>
+          <textarea name='textInput' placeholder='Enter text to convert...' rows={17} cols={40}></textarea>
+          <button>Generate LaTeX</button>
         </div>
         <div id="div2">
           <p>LaTeX</p>
