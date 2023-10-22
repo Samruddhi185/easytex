@@ -46,7 +46,7 @@ h1 {
 
 h3 {
 	text-align: center;
-	font-family: 'Dancing Script', cursive;
+	/* font-family: 'Dancing Script', cursive; */
   font-size: 40px;
   color: bisque;
 	margin-bottom: 30px;
@@ -71,14 +71,16 @@ body {
   text-align: center;
   justify-content: center;
   margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap; 
 }
 
 .container div {
-  height: 500px;
-  width: 400px;
+  height: 600px;
+  width: 406px;
   background: rgb(49, 38, 38);
   margin: 10px;
-  display: inline-block;
+  flex: 1;
 }
 
 #div1 {
@@ -100,10 +102,12 @@ textarea {
 
 button {
   font-size: large;
-  font-family: cursive;
+  /* font-family: cursive; */
   padding: 5px;
   background-color: rgba(0, 255, 255, 0.193);
   border-style: groove;
+  width: 406px;
+  margin: 10px;
 }
 
 .typewriter {
@@ -138,7 +142,7 @@ button {
   display: grid;
   place-content: center;
   background-color: var(--background-color);
-  min-height: 100vh;
+  height: 100vh;
   font-family: "Oswald", sans-serif;
   font-size: clamp(1.5rem, 1rem + 18vw, 15rem);
   font-weight: 700;
@@ -160,4 +164,9 @@ button {
   background-clip: text;
   -webkit-background-clip: text;
   transform: translateX(-0.02em);
+}
+
+.scroll-content {
+  overflow-y: scroll;
+  height: calc(100vh - 50px);
 }
