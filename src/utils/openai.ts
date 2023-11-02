@@ -1,4 +1,9 @@
-const OpenAI = require('openai-api');
-const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-const openai = new OpenAI(OPENAI_API_KEY);
+import { OpenAI } from 'openai';
+const openai = new OpenAI(
+    {
+        apiKey: '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',
+        // dangerouslyAllowBrowser: true
+    }
+);
+
 export default openai

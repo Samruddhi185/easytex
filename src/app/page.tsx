@@ -40,23 +40,22 @@ export default function Home() {
 const generateLaTexBtnClick = (e: React.MouseEvent<HTMLElement>) => {
   console.log("API Key:", process.env.NEXT_PUBLIC_OPENAI_API_KEY);
 
-  const textInp = document.getElementById("textInput");
+  const textInp = document.getElementById("textInput") as HTMLInputElement | null;
   var latexresp = document.getElementById('latexResponse');
   (async () => {
-      const gptResponse = await openai.complete({
-          engine: 'gpt-3.5-turbo',
-          prompt: textInp?.innerHTML,
-          maxTokens: 5,
-          temperature: 0.9,
-          topP: 1,
-          presencePenalty: 0,
-          frequencyPenalty: 0,
-          bestOf: 1,
-          n: 1,
-          stream: false,
-          stop: ['\n', "testing"]
-      });
-
-      latexresp!.innerHTML = gptResponse.data;
+      const userInput = textInp?.value || '';
+      const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
+          messages: [
+            {role: 'system', content: "You are a helpful assistant."},
+            {role: 'user', content: userInput}
+          
+          ],
+          model: 'gpt-3.5-turbo',
+          
+      }).withResponse();
+      // console.log("resp ", chatCompletion.choices[0].message.content)
+      if(chatCompletion.choices[0].message.content) {
+        latexresp!.innerHTML = chatCompletion.choices[0].message.content;
+      }
   })();
 }
