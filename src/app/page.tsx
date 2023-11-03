@@ -1,61 +1,78 @@
 'use client';
-import Head from 'next/head'
-import Image from 'next/image'
-import openai from "@/utils/openai";
-import React, { MouseEvent } from 'react';
-import type { NextApiRequest, NextApiResponse } from "next";
+import { Card, CardBody, CardHeader } from '@nextui-org/react';
+// @ts-ignore
+import { parse, HtmlGenerator, LaTeXJSComponent } from 'latex.js';
+import React, { useState } from 'react';
+import Chat from './chat';
+import Code from './code';
+import RenderedTexContainer from './rendered';
+import openai from '@/utils/openai';
 
 export default function Home() {
+  const [codeString, setCodeString] = useState<string>('');
+  const [chatHistory, setChatHistory] = useState<string[]>([]);
+
+  const components = [
+    {name: "chat", component: <Chat chatHistory={chatHistory} onChatInput={async(data:string) => {
+      setChatHistory([...chatHistory, data]);
+      const newData = await generateLatex(data, codeString);
+      if (newData != codeString) {
+        setCodeString(newData);
+      }
+    }} ></Chat>, title: "Chat with EasyTex"},
+    { name: "code", component: <Code code={codeString}></Code>, title: "TeX code" },
+    { name: "render", component: <RenderedTexContainer code={codeString}/>, title: "Rendered LaTeX"}
+  ];
+  React.useEffect(() => {
+    window.customElements.get('latex-js') || window.customElements.define("latex-js", LaTeXJSComponent);
+  });
+
   return (
     <main>
-      <section className="wrapper">
-        <div className="top">EasyTex</div>
-        <div className="bottom" aria-hidden="true">EasyTex</div>
-      </section>
-      <div className="scroll-content" id="page-2">
-        <h3 className="typewriter">Text to LaTeX conversion</h3>
-        <div className="container">
-          <div id="div1">
-            <h5>Enter Your Input</h5><br></br>
-            <textarea id='textInput' placeholder='Enter text to convert...' rows={22} cols={40}></textarea>
-          </div>
-          <div id="div2">
-            <h5>LaTeX</h5>
-            <textarea id='latexResponse' placeholder='Generate LaTeX first...' rows={22} cols={40}></textarea>
-          </div>
-          <div id="div3">
-            <h5>PDF Preview</h5>
-          </div>
-        </div>
-        <div className="container">
-          <button onClick={generateLaTexBtnClick}>Generate LaTeX</button>
-          <button>Generate PDF Preview</button>
-          <button>Download</button>
-        </div>
+      <div className="flex h-screen">
+      <div className="m-auto h-full w-full px-3 py-8 grid grid-cols-3 gap-4 ">
+        {
+          components.map((componentMetadata) => {
+            return (
+              <Card className="py-4 px-2 h-full" shadow="sm" key={componentMetadata.name}>
+                <CardHeader>
+                  <h4>{componentMetadata.title}</h4>
+                </CardHeader>
+                <CardBody className="h-full">
+                  {componentMetadata.component}
+                </CardBody>
+              </Card>
+            );
+          })
+        }
+      </div>
       </div>
     </main>
   )
 }
 
-const generateLaTexBtnClick = (e: React.MouseEvent<HTMLElement>) => {
-  console.log("API Key:", process.env.NEXT_PUBLIC_OPENAI_API_KEY);
+const generateLatex = async (userInput:string, prev: string): Promise<string> => {
+  openai.apiKey = process.env.OPEN_AI_KEY || '';
+  console.log("calling open ai");
+  try {
+    const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: "You are responsible for understanding a user's prompts for generating a latex document. You must return the entire document after modifications. Don't add any sentences before or after the latex code." },
+        { role: 'user', content: `The latex document you're working on is backticks below: 
+          \`\`\`${prev}\`\`\`
+          
+          The users's prompt is in the backticks below:
 
-  const textInp = document.getElementById("textInput") as HTMLInputElement | null;
-  var latexresp = document.getElementById('latexResponse');
-  (async () => {
-      const userInput = textInp?.value || '';
-      const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
-          messages: [
-            {role: 'system', content: "You are a helpful assistant."},
-            {role: 'user', content: userInput}
-          
-          ],
-          model: 'gpt-3.5-turbo',
-          
-      }).withResponse();
-      // console.log("resp ", chatCompletion.choices[0].message.content)
-      if(chatCompletion.choices[0].message.content) {
-        latexresp!.innerHTML = chatCompletion.choices[0].message.content;
-      }
-  })();
+          \`\`\`${userInput}\`\`\`
+          ` }
+      ],
+      model: 'gpt-3.5-turbo',
+    }).withResponse();
+    if (chatCompletion.choices[0].message.content) {
+      return chatCompletion.choices[0].message.content;
+    }
+    return prev;
+  } catch(e) {
+    return prev;
+  }
 }
