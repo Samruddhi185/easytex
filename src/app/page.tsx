@@ -11,16 +11,20 @@ import openai from '@/utils/openai';
 export default function Home() {
   const [codeString, setCodeString] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<string[]>([]);
+  const [showProgress, setProgressVisibility] = useState<boolean>(false);
 
   const components = [
     {name: "chat", component: <Chat chatHistory={chatHistory} onChatInput={async(data:string) => {
       setChatHistory([...chatHistory, data]);
+      setProgressVisibility(true);
+      {}
       const newData = await generateLatex(data, codeString);
       if (newData != codeString) {
         setCodeString(newData);
+        setProgressVisibility(false);
       }
     }} ></Chat>, title: "Chat with EasyTex"},
-    { name: "code", component: <Code code={codeString}></Code>, title: "TeX code" },
+    { name: "code", component: <Code code={codeString} showProgress={showProgress}></Code>, title: "TeX code" },
     { name: "render", component: <RenderedTexContainer code={codeString}/>, title: "Rendered LaTeX"}
   ];
   React.useEffect(() => {
@@ -52,7 +56,6 @@ export default function Home() {
 }
 
 const generateLatex = async (userInput:string, prev: string): Promise<string> => {
-  openai.apiKey = process.env.OPEN_AI_KEY || '';
   console.log("calling open ai");
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
