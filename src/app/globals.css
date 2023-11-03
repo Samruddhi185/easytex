@@ -8,27 +8,6 @@
   --background-end-rgb: 255, 255, 255;
 }
 
-/* main {
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-  height: 100vh;
-}
-
-@keyframes gradient {
-  0% {
-      background-position: 0% 50%;
-  }
-
-  50% {
-      background-position: 100% 50%;
-  }
-
-  100% {
-      background-position: 0% 50%;
-  }
-} */
-
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
@@ -96,18 +75,12 @@ body {
   background-color:rgba(145, 145, 4, 0.409);
 }
 
-textarea {
+/* textarea {
   background-color: #0000008d;
-}
+} */
 
-button {
-  font-size: large;
-  /* font-family: cursive; */
-  padding: 5px;
-  background-color: rgba(0, 255, 255, 0.193);
-  border-style: groove;
-  width: 406px;
-  margin: 10px;
+#textarea-wrapper>div>div {
+  height: auto !important;
 }
 
 .typewriter {

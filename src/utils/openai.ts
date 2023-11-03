@@ -1,9 +1,10 @@
 import { OpenAI } from 'openai';
+
 const openai = new OpenAI(
     {
         apiKey: '',
-        // dangerouslyAllowBrowser: true
+        dangerouslyAllowBrowser: true
     }
 );
 
-export default openai
+export default openai;
