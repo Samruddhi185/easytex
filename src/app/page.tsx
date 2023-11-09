@@ -76,6 +76,7 @@ const generateLatex = async (userInput:string, prev: string): Promise<string> =>
       if (content.substring(0, 3) == '```') {
         content = content.substring(3, content.length-3);
       }
+      content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
       return content;
     }
     return prev;
