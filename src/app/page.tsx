@@ -60,7 +60,7 @@ const generateLatex = async (userInput:string, prev: string): Promise<string> =>
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
       messages: [
-        { role: 'system', content: "You are responsible for understanding a user's prompts for generating a latex document. You must return the entire document after modifications. Don't add any sentences before or after the latex code." },
+        { role: 'system', content: "You are a latex code generator, directed by the user's prompts. You must return the entire document after modifications. Make sure to import any packages when you use a command. Return only the latex code, and remove the backticks." },
         { role: 'user', content: `The latex document you're working on is backticks below: 
           \`\`\`${prev}\`\`\`
           
@@ -72,7 +72,11 @@ const generateLatex = async (userInput:string, prev: string): Promise<string> =>
       model: 'gpt-3.5-turbo',
     }).withResponse();
     if (chatCompletion.choices[0].message.content) {
-      return chatCompletion.choices[0].message.content;
+      let content = chatCompletion.choices[0].message.content;
+      if (content.substring(0, 3) == '```') {
+        content = content.substring(3, content.length-3);
+      }
+      return content;
     }
     return prev;
   } catch(e) {
