@@ -69,7 +69,7 @@ const generateLatex = async (userInput:string, prev: string): Promise<string> =>
           \`\`\`${userInput}\`\`\`
           ` }
       ],
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4-1106-preview',
     }).withResponse();
     if (chatCompletion.choices[0].message.content) {
       let content = chatCompletion.choices[0].message.content;
