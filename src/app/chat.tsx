@@ -1,8 +1,11 @@
-import { Card, CardBody, Textarea } from "@nextui-org/react";
+import { Card, CardBody, Textarea, Input, image } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
+import { generateLatexFromImage } from "./page";
 
-export default function ChatContainer( {chatHistory, onChatInput}:{chatHistory:string[], onChatInput:any}) {
+export default function ChatContainer( {chatHistory, onChatInput, setCodeString, setProgressVisibility}:{chatHistory:string[], onChatInput:any, setCodeString:any, setProgressVisibility:any}) {
     const [chatData, setChatData] = useState('');
+    const [inputFileBase64, setinputFileBase64] = useState<any>(null);
+    const [showInput, setShowInput] = useState<boolean>(true);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -47,5 +50,30 @@ export default function ChatContainer( {chatHistory, onChatInput}:{chatHistory:s
             }}
             value={chatData}
         />
+        <Input type="file" onChange={async (e) => {
+            const target= e.target as HTMLInputElement;
+            if (!target.files) return;
+            const imageFile = target.files[0];
+
+            if (imageFile) {
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+                    const imageAsBase64 = event.target?.result;
+                    setinputFileBase64(imageAsBase64);
+                    console.log("Base64 Encoded Image:", imageAsBase64);
+                };
+
+                reader.readAsDataURL(imageFile);
+
+                let newData = await generateLatexFromImage(inputFileBase64);
+                console.log("Returned data from vision api: " + newData);
+                setShowInput(false);
+                setCodeString(newData);
+                setProgressVisibility(false);
+            }
+
+            
+        }}></Input>
     </div>);
 }
