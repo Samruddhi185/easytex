@@ -87,8 +87,8 @@ export const generateLatex = async (userInput:string, prev: string): Promise<str
 
 export const generateLatexFromImage = async (imageAsBase64: string): Promise<string> => {
   try {
-    const imageContent = `data:image/png;base64,${imageAsBase64}`;
-    console.log("Image Content: " + imageContent);
+    // const imageContent = `data:image/png;base64,${imageAsBase64}`;
+    console.log("Image Content: " + imageAsBase64);
 
     const axios = require('axios');
 
@@ -97,14 +97,14 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
       {
         "model": "gpt-4-vision-preview",
         "messages": [
-          { "role": 'system', "content": "You are a latex code generator, directed to convert the image to latex code. You must process the image and return the content as latex code. Make sure to import any packages when you use a command. Return only the latex code." },
+          // { "role": 'system', "content": "You are a latex code generator, directed to convert the image to latex code. You must process the image and return the content as latex code. Make sure to import any packages when you use a command. Return only the latex code." },
           {
             "role": "user",
             "content": [
               {
                 "type": "image_url",
                 "image_url": {
-                  "url": imageContent
+                  "url": imageAsBase64
                 }
               }
             ]
@@ -140,7 +140,7 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
     //           type: "image_url", 
     //           image_url: 
     //           {
-    //             "url": "imageContent"
+    //             "url": imageContent
     //           }
     //         }
     //       ]
