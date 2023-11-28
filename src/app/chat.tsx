@@ -58,19 +58,20 @@ export default function ChatContainer( {chatHistory, onChatInput, setCodeString,
             if (imageFile) {
                 const reader = new FileReader();
 
-                reader.onload = (event) => {
+                reader.onloadend = async (event) => {
                     const imageAsBase64 = event.target?.result;
                     setinputFileBase64(imageAsBase64);
                     console.log("Base64 Encoded Image:", imageAsBase64);
+                    if (imageAsBase64) {
+                        let newData = await generateLatexFromImage(imageAsBase64?.toString());
+                        console.log("Returned data from vision api: " + newData);
+                        setShowInput(false);
+                        setCodeString(newData);
+                        setProgressVisibility(false);
+                    }
                 };
 
                 reader.readAsDataURL(imageFile);
-
-                let newData = await generateLatexFromImage(inputFileBase64);
-                console.log("Returned data from vision api: " + newData);
-                setShowInput(false);
-                setCodeString(newData);
-                setProgressVisibility(false);
             }
 
             
