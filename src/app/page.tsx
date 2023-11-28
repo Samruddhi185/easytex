@@ -97,7 +97,7 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
       {
         "model": "gpt-4-vision-preview",
         "messages": [
-          // { "role": 'system', "content": "You are a latex code generator, directed to convert the image to latex code. You must process the image and return the content as latex code. Make sure to import any packages when you use a command. Return only the latex code." },
+          { "role": 'system', "content": "You are a latex code generator, directed to extract text from the image and convert it to latex code. Return only the latex code within begin{document} and end{document} tags." },
           {
             "role": "user",
             "content": [
@@ -121,8 +121,8 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
     );
 
     console.log(response.data);
-    if (response.choices[0].message.content) {
-        let content = response.choices[0].message.content;
+    if (response.data.choices[0].message.content) {
+        let content = response.data.choices[0].message.content;
         console.log("Vision API content: " + content);
         if (content.substring(0, 3) == '```') {
           content = content.substring(3, content.length-3);
