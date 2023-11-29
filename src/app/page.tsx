@@ -1,5 +1,5 @@
 'use client';
-import { Card, CardBody, CardHeader } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Input } from '@nextui-org/react';
 // @ts-ignore
 import { parse, HtmlGenerator, LaTeXJSComponent } from 'latex.js';
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ export default function Home() {
   const [showProgress, setProgressVisibility] = useState<boolean>(false);
 
   const components = [
-    {name: "chat", component: <Chat chatHistory={chatHistory} onChatInput={async(data:string) => {
+    {name: "chat", component: <Chat chatHistory={chatHistory} setCodeString={setCodeString} setProgressVisibility={setProgressVisibility} onChatInput={async(data:string) => {
       setChatHistory([...chatHistory, data]);
       setProgressVisibility(true);
       {}
@@ -55,7 +55,7 @@ export default function Home() {
   )
 }
 
-const generateLatex = async (userInput:string, prev: string): Promise<string> => {
+export const generateLatex = async (userInput:string, prev: string): Promise<string> => {
   console.log("calling open ai");
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
@@ -84,3 +84,89 @@ const generateLatex = async (userInput:string, prev: string): Promise<string> =>
     return prev;
   }
 }
+
+export const generateLatexFromImage = async (imageAsBase64: string): Promise<string> => {
+  try {
+    // const imageContent = `data:image/png;base64,${imageAsBase64}`;
+    console.log("Image Content: " + imageAsBase64);
+
+    const axios = require('axios');
+
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        "model": "gpt-4-vision-preview",
+        "messages": [
+          { "role": 'system', "content": "You are a latex code generator, directed to extract text from the image and convert it to latex code. Return only the latex code within begin{document} and end{document} latex tags." },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "image_url",
+                "image_url": {
+                  "url": imageAsBase64
+                }
+              }
+            ]
+          }
+        ],
+        "max_tokens": 1000
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_OPEN_AI_KEY}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (response.data.choices[0].message.content) {
+        let content = response.data.choices[0].message.content;
+        console.log("Vision API content: " + content);
+        if (content.substring(0, 3) == '```') {
+          content = content.substring(3, content.length-3);
+        }
+        content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
+        return content;
+      }
+    
+    // console.log(openai.apiKey);
+    // const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
+    //   messages: [
+    //     { role: 'system', content: "You are a latex code generator, directed to convert the image to latex code. You must process the image and return the content as latex code. Make sure to import any packages when you use a command. Return only the latex code." },
+    //     { role: 'user', content: [
+    //       {
+    //           type: "image_url", 
+    //           image_url: 
+    //           {
+    //             "url": imageContent
+    //           }
+    //         }
+    //       ]
+    //     },
+    //   ],
+    //   model: 'gpt-4-vision-preview',
+    // }).withResponse();
+    // if (chatCompletion.choices[0].message.content) {
+    //   let content = chatCompletion.choices[0].message.content;
+    //   console.log("Vision API content: " + content);
+    //   if (content.substring(0, 3) == '```') {
+    //     content = content.substring(3, content.length-3);
+    //   }
+    //   content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
+    //   return content;
+    // }
+    return "";
+  }
+  catch (e) {
+    return "";
+  }
+}
+
+// export function refreshCodeArea(code: string): void {
+//   if (code != codeString) {
+//     setCodeString(code);
+//     setProgressVisibility(false);
+//   }
+// }
