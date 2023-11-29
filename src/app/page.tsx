@@ -97,7 +97,7 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
       {
         "model": "gpt-4-vision-preview",
         "messages": [
-          { "role": 'system', "content": "You are a latex code generator, directed to extract text from the image and convert it to latex code. Return only the latex code within begin{document} and end{document} tags." },
+          { "role": 'system', "content": "You are a latex code generator, directed to extract text from the image and convert it to latex code. Return only the latex code within begin{document} and end{document} latex tags." },
           {
             "role": "user",
             "content": [

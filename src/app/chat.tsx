@@ -50,13 +50,14 @@ export default function ChatContainer( {chatHistory, onChatInput, setCodeString,
             }}
             value={chatData}
         />
-        <Input type="file" onChange={async (e) => {
+        {showInput && <center><Input type="file" className="fileInput" onChange={async (e) => {
             const target= e.target as HTMLInputElement;
             if (!target.files) return;
             const imageFile = target.files[0];
 
             if (imageFile) {
                 const reader = new FileReader();
+                setProgressVisibility(true);
 
                 reader.onloadend = async (event) => {
                     const imageAsBase64 = event.target?.result;
@@ -75,6 +76,6 @@ export default function ChatContainer( {chatHistory, onChatInput, setCodeString,
             }
 
             
-        }}></Input>
+        }}></Input></center>}
     </div>);
 }
