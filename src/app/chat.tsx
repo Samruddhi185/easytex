@@ -2,10 +2,10 @@ import { Card, CardBody, Textarea, Input, image } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
 import { generateLatexFromImage } from "./page";
 
-export default function ChatContainer( {chatHistory, onChatInput, setCodeString, setProgressVisibility}:{chatHistory:string[], onChatInput:any, setCodeString:any, setProgressVisibility:any}) {
+export default function ChatContainer( {chatHistory, onChatInput, setCodeString, setProgressVisibility, showInput, setShowInput}:{chatHistory:string[], onChatInput:any, setCodeString:any, setProgressVisibility:any, showInput:boolean, setShowInput:any}) {
     const [chatData, setChatData] = useState('');
     const [inputFileBase64, setinputFileBase64] = useState<any>(null);
-    const [showInput, setShowInput] = useState<boolean>(true);
+    
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {

@@ -12,14 +12,16 @@ export default function Home() {
   const [codeString, setCodeString] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<string[]>([]);
   const [showProgress, setProgressVisibility] = useState<boolean>(false);
+  const [showInput, setShowInput] = useState<boolean>(true);
 
   const components = [
-    {name: "chat", component: <Chat chatHistory={chatHistory} setCodeString={setCodeString} setProgressVisibility={setProgressVisibility} onChatInput={async(data:string) => {
+    {name: "chat", component: <Chat chatHistory={chatHistory} setCodeString={setCodeString} setProgressVisibility={setProgressVisibility} showInput={showInput} setShowInput={setShowInput} onChatInput={async(data:string) => {
       setChatHistory([...chatHistory, data]);
       setProgressVisibility(true);
       {}
       const newData = await generateLatex(data, codeString);
       if (newData != codeString) {
+        setShowInput(false);
         setCodeString(newData);
         setProgressVisibility(false);
       }
@@ -163,10 +165,3 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
     return "";
   }
 }
-
-// export function refreshCodeArea(code: string): void {
-//   if (code != codeString) {
-//     setCodeString(code);
-//     setProgressVisibility(false);
-//   }
-// }
