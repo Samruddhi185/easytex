@@ -19,7 +19,8 @@ export default function Home() {
       setChatHistory([...chatHistory, data]);
       setProgressVisibility(true);
       {}
-      const newData = await generateLatex(data, codeString);
+      const newData = await generateLatexUsingAssistantsAPI(data, codeString);
+      console.log("New data: " + newData);
       if (newData != codeString) {
         setShowInput(false);
         setCodeString(newData);
@@ -81,6 +82,83 @@ export const generateLatex = async (userInput:string, prev: string): Promise<str
       content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
       return content;
     }
+    return prev;
+  } catch(e) {
+    return prev;
+  }
+}
+
+export const generateLatexUsingAssistantsAPI = async (userInput:string, prev: string): Promise<string> => {
+  console.log("calling openai assistant api");
+  try {
+    const assistant = await openai.beta.assistants.create({
+      name: "Data visualizer",
+      description: "You are a latex code generator, directed by the user's prompts. You must use the previously generatted latex code and perform modifications. Make sure to import any packages when you use a command. Return only the latex code, and remove the backticks.",
+      model: "gpt-4-1106-preview",
+      tools: [{"type": "code_interpreter"}],
+    });
+
+    const myThread = await openai.beta.threads.create();
+
+    const myThreadMessage = await openai.beta.threads.messages.create(
+      (myThread.id),
+      {
+        role: "user",
+        content: userInput,
+      }
+    );
+    console.log("This is the message object: ", myThreadMessage, "\n");
+
+    const myRun = await openai.beta.threads.runs.create(
+      (myThread.id),
+      {
+        assistant_id: assistant.id,
+        instructions: "Please return the latex code.",
+      }
+    );
+    console.log("This is the run object: ", myRun, "\n");
+
+    // Step 5: Periodically retrieve the Run to check on its status to see if it has moved to completed
+    const retrieveRun = async () => {
+      let keepRetrievingRun;
+
+      while (myRun.status !== "completed") {
+        keepRetrievingRun = await openai.beta.threads.runs.retrieve(
+          (myThread.id),
+          (myRun.id)
+        );
+
+        console.log(`Run status: ${keepRetrievingRun.status}`);
+
+        if (keepRetrievingRun.status === "completed") {
+          console.log("\n");
+          break;
+        }
+      }
+    };
+    retrieveRun();
+
+    const waitForAssistantMessage = async () : Promise<string> => {
+      await retrieveRun();
+  
+      const allMessages = await openai.beta.threads.messages.list(
+        (myThread.id)
+      );
+  
+      console.log(
+        "------------------------------------------------------------ \n"
+      );
+  
+      console.log("User: ", myThreadMessage.content[0].text.value);
+      console.log("Assistant: ", allMessages.data[0].content[0].text.value);
+      let content = allMessages.data[0].content[0].text.value;
+      if (content.substring(0, 3) == '```') {
+        content = content.substring(3, content.length-3);
+      }
+      content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
+      return content;
+    };
+    waitForAssistantMessage();
     return prev;
   } catch(e) {
     return prev;
