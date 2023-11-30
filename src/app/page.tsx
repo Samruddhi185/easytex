@@ -19,7 +19,7 @@ export default function Home() {
       setChatHistory([...chatHistory, data]);
       setProgressVisibility(true);
       {}
-      const newData = await generateLatexUsingAssistantsAPI(data, codeString);
+      const newData = await generateLatexUsingAssistantsAPI(data, codeString, setShowInput, setCodeString, setProgressVisibility);
       console.log("New data: " + newData);
       if (newData != codeString) {
         setShowInput(false);
@@ -88,7 +88,7 @@ export const generateLatex = async (userInput:string, prev: string): Promise<str
   }
 }
 
-export const generateLatexUsingAssistantsAPI = async (userInput:string, prev: string): Promise<string> => {
+export const generateLatexUsingAssistantsAPI = async (userInput:string, prev: string, setShowInput: any, setCodeString: any, setProgressVisibility: any): Promise<string> => {
   console.log("calling openai assistant api");
   try {
     const assistant = await openai.beta.assistants.create({
@@ -156,6 +156,11 @@ export const generateLatexUsingAssistantsAPI = async (userInput:string, prev: st
         content = content.substring(3, content.length-3);
       }
       content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
+
+      setShowInput(false);
+      setCodeString(content);
+      setProgressVisibility(false);
+
       return content;
     };
     waitForAssistantMessage();
