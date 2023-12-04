@@ -8,7 +8,7 @@ interface CodeProps {
 }
 
 export default function CodeContainer({code, showProgress}: CodeProps) {
-    console.log("rendering", code);
+    // console.log("rendering", code);
     return (<div className = 'h-full'>
         <Card className="w-full h-full overflow-y-auto p-1">
         {showProgress && <center><Progress size="sm" isIndeterminate aria-label="Loading..." className="max-w-md" /></center>}
