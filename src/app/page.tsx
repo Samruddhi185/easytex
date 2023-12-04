@@ -58,7 +58,7 @@ export default function Home() {
 }
 
 export const generateLatex = async (userInput:string, prev: string): Promise<string> => {
-  console.log("calling open ai");
+  // console.log("calling open ai");
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
       messages: [
@@ -75,11 +75,14 @@ export const generateLatex = async (userInput:string, prev: string): Promise<str
     }).withResponse();
     if (chatCompletion.choices[0].message.content) {
       let content = chatCompletion.choices[0].message.content;
-      if (content.substring(0, 3) == '```') {
-        content = content.substring(3, content.length-3);
+      
+      const regex = /\\documentclass[\s\S]*?\\end{document}/;
+      const match = content.match(regex);
+
+      // If there is a match, return the matched LaTeX code
+      if (match) {
+        return match[0];
       }
-      content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
-      return content;
     }
     return prev;
   } catch(e) {
@@ -90,7 +93,7 @@ export const generateLatex = async (userInput:string, prev: string): Promise<str
 export const generateLatexFromImage = async (imageAsBase64: string): Promise<string> => {
   try {
     // const imageContent = `data:image/png;base64,${imageAsBase64}`;
-    console.log("Image Content: " + imageAsBase64);
+    // console.log("Image Content: " + imageAsBase64);
 
     const axios = require('axios');
 
@@ -122,7 +125,7 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
       }
     );
 
-    console.log(response.data);
+    // console.log(response.data);
     if (response.data.choices[0].message.content) {
         let content = response.data.choices[0].message.content;
         console.log("Vision API content: " + content);
@@ -133,32 +136,6 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
         return content;
       }
     
-    // console.log(openai.apiKey);
-    // const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
-    //   messages: [
-    //     { role: 'system', content: "You are a latex code generator, directed to convert the image to latex code. You must process the image and return the content as latex code. Make sure to import any packages when you use a command. Return only the latex code." },
-    //     { role: 'user', content: [
-    //       {
-    //           type: "image_url", 
-    //           image_url: 
-    //           {
-    //             "url": imageContent
-    //           }
-    //         }
-    //       ]
-    //     },
-    //   ],
-    //   model: 'gpt-4-vision-preview',
-    // }).withResponse();
-    // if (chatCompletion.choices[0].message.content) {
-    //   let content = chatCompletion.choices[0].message.content;
-    //   console.log("Vision API content: " + content);
-    //   if (content.substring(0, 3) == '```') {
-    //     content = content.substring(3, content.length-3);
-    //   }
-    //   content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
-    //   return content;
-    // }
     return "";
   }
   catch (e) {

@@ -2,9 +2,9 @@ import { Card } from '@nextui-org/react';
 import React from 'react';
 
 export default function RenderedTexContainer({code}:{code:string;}) {
-    console.log("got new props", code);
+    // console.log("got new props", code);
     React.useEffect(() => {
-        console.log("use effect was called", code);
+        // console.log("use effect was called", code);
         const htmlData = `<latex-js id="latex-code" baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">
             ${code}
         </latex-js> '`;
