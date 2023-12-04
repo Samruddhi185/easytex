@@ -10,7 +10,7 @@ export default function RenderedTexContainer({ code }: { code: string; }) {
     React.useEffect(() => {
         const htmlData = `<latex-js id="latex-content" baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">
             ${code}
-        </latex-js> '`;
+        </latex-js>`;
         document.getElementById("latex-code")!.innerHTML = htmlData;
     });
 

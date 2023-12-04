@@ -32,7 +32,8 @@ export default function Home() {
             onChatInput={async (data: string) => {
               setChatHistory([...chatHistory, data]);
               setProgressVisibility(true);
-              let newData = await callAssistant(data);
+              // let newData = await callAssistant(data);
+              let newData = await generateLatex(data, codeString);
               if (newData != codeString) {
                 setShowInput(false);
                 // const renderError = checkForRenderErrors(codeString);
@@ -85,15 +86,15 @@ export const generateLatex = async (userInput: string, prev: string): Promise<st
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
       messages: [
-        // { role: 'system', content: "You are a latex code generator, directed by the user's prompts. You must return the entire document after modifications. Make sure to not use any external packages except for asmath. Return only the latex code, and remove the backticks." },
-        { role: 'system', content: "You are a latex code generator, directed by the user's prompts. You must return the entire document after modifications." },
+        { role: 'system', content: "You are a latex code generator, directed by the user's prompts. You must return the entire document after modifications. Make sure to import any packages when you use a command. Return only the latex code, and remove the backticks." },
         {
-          role: 'user', 
-          content: `The users's prompt is in the backticks below:
+          role: 'user', content: `The latex document you're working on is backticks below: 
+          \`\`\`${prev}\`\`\`
           
+          The users's prompt is in the backticks below:
+
           \`\`\`${userInput}\`\`\`
-          
-          `}
+          ` }
       ],
       model: 'gpt-4-1106-preview',
     }).withResponse();
@@ -117,7 +118,7 @@ export const generateLatex = async (userInput: string, prev: string): Promise<st
 export const generateLatexFromImage = async (imageAsBase64: string): Promise<string> => {
   try {
     // const imageContent = `data:image/png;base64,${imageAsBase64}`;
-    // console.log("Image Content: " + imageAsBase64);
+    console.log("Image Content: " + imageAsBase64);
 
     const axios = require('axios');
 
@@ -149,10 +150,10 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
       }
     );
 
-    // console.log(response.data);
+    console.log(response.data);
     if (response.data.choices[0].message.content) {
         let content = response.data.choices[0].message.content;
-        //  console.log("Vision API content: " + content);
+         console.log("Vision API content: " + content);
         const regex = /\\documentclass[\s\S]*?\\end{document}/;
         const match = content.match(regex);
 
