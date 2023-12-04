@@ -8,10 +8,10 @@ import { parse, HtmlGenerator, LaTeXJSComponent } from 'latex.js';
 
 export default function RenderedTexContainer({ code }: { code: string; }) {
     React.useEffect(() => {
-        const htmlData = `<latex-js id="latex-content" baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">
-            ${code}
-        </latex-js>`;
-        document.getElementById("latex-code")!.innerHTML = htmlData;
+        // if (code.length > 0) {
+            const htmlData = `<iframe src="/out.pdf#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0" frameBorder="0" width="100%" height="100%"/>`;
+            document.getElementById("latex-code")!.innerHTML = htmlData;
+        // }
     });
 
     return (

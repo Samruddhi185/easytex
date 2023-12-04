@@ -29,6 +29,7 @@ export default function Home() {
             setProgressVisibility={setProgressVisibility}
             showInput={showInput}
             setShowInput={setShowInput}
+            renderLatex={renderLatex}
             onChatInput={async (data: string) => {
               setChatHistory([...chatHistory, data]);
               setProgressVisibility(true);
@@ -41,6 +42,7 @@ export default function Home() {
                 //   console.log("render error was", renderError);
                 //   newData = await callAssistant(`There's a bug in the code with this error, make sure to remove any unnecessary packages or add missing characters - \"${renderError.message}\"`);
                 // }
+                await renderLatex(newData);
                 setCodeString(newData);
                 setProgressVisibility(false);
               }
@@ -81,12 +83,27 @@ const callAssistant = async(input: string): Promise<string> => {
   }
 }
 
+const renderLatex = async(code: string): Promise<void> => {
+  console.log("CALLING RENDER LATEX");
+  await fetch('/api/render', {
+    method: 'POST', 
+    body: JSON.stringify({
+      input: code,
+    })
+  });
+}
+
 export const generateLatex = async (userInput: string, prev: string): Promise<string> => {
   console.log("calling open ai");
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
       messages: [
-        { role: 'system', content: "You are a latex code generator, directed by the user's prompts. You must return the entire document after modifications. Make sure to import any packages when you use a command. Return only the latex code, and remove the backticks." },
+        { role: 'system', content: "You are a latex code generator, directed by the user's prompts.\
+ You must return the entire document after modifications.\
+ Make sure to import any packages when you use a command.\
+ Generate lorem ipsum or random text yourself instead of using the lipsum package.\
+ Dont use \\equation tag for math formulae.\
+ Return only the latex code, and remove the backticks." },
         {
           role: 'user', content: `The latex document you're working on is backticks below: 
           \`\`\`${prev}\`\`\`

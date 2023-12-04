@@ -2,7 +2,7 @@ import { Card, CardBody, Textarea, Input, image, CardHeader } from "@nextui-org/
 import { useEffect, useRef, useState } from "react";
 import { generateLatexFromImage } from "./page";
 
-export default function ChatContainer({ chatHistory, onChatInput, setCodeString, setProgressVisibility, showInput, setShowInput }: { chatHistory: string[], onChatInput: any, setCodeString: any, setProgressVisibility: any, showInput: boolean, setShowInput: any }) {
+export default function ChatContainer({ chatHistory, onChatInput, setCodeString, setProgressVisibility, showInput, setShowInput, renderLatex }: { chatHistory: string[], onChatInput: any, setCodeString: any, setProgressVisibility: any, showInput: boolean, setShowInput: any, renderLatex: any }) {
     const [chatData, setChatData] = useState('');
     const [inputFileBase64, setinputFileBase64] = useState<any>(null);
 
@@ -73,6 +73,7 @@ export default function ChatContainer({ chatHistory, onChatInput, setCodeString,
                                     let newData = await generateLatexFromImage(imageAsBase64?.toString());
                                     console.log("Returned data from vision api: " + newData);
                                     setShowInput(false);
+                                    await renderLatex(newData);
                                     setCodeString(newData);
                                     setProgressVisibility(false);
                                 }

@@ -32,6 +32,7 @@ const openai: OpenAI = openAiRef.value;
 class AssistantApi {
     private initialPrompt = `You are a latex code generator, directed by the user's prompts. You must return the entire document after modifications.\
  Make sure to not use any external packages except for any required to render math equations. Generate lorem ipsum or random text yourself instead of using the lipsum package.\
+ Dont use \\equation tag for math formulae.\
  Return plain text code only without backticks`;
 
     private assistant!: OpenAI.Beta.Assistants.Assistant;
@@ -67,6 +68,10 @@ class AssistantApi {
         //         console.log("delete attempt", response, ass);
         //     }
         // }
+
+        await openai.beta.assistants.update("asst_VaIq6SHRggTcoIdNzxAT1XTP", {
+            instructions: this.initialPrompt,
+        });
 
         this.assistant = await openai.beta.assistants.retrieve(
             "asst_VaIq6SHRggTcoIdNzxAT1XTP"
