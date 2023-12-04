@@ -35,10 +35,18 @@ export default function RenderedTexContainer({ code }: { code: string; }) {
 
 
 const download = async(code: string): Promise<void> => {
-    await fetch('/api/pdf', {
+    const res = await fetch('/api/pdf', {
         method: 'POST',
         body: JSON.stringify({input : code})
     });
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'latex.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 }
 
 const downloadOld = async (code: string): Promise<void> => {
