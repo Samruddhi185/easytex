@@ -94,6 +94,10 @@ class AssistantApi {
         
         console.log("run created", run);
         while (run.status != 'completed') {
+            if (run.status === 'failed') {
+                return {message: "", error: true};
+            }
+            
             await new Promise(r => setTimeout(r, 2000));
             console.log("STATUS" ,run.status);
             run = await openai.beta.threads.runs.retrieve(this.thread.id, run.id);
