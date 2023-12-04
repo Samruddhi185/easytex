@@ -128,12 +128,14 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
     // console.log(response.data);
     if (response.data.choices[0].message.content) {
         let content = response.data.choices[0].message.content;
-        console.log("Vision API content: " + content);
-        if (content.substring(0, 3) == '```') {
-          content = content.substring(3, content.length-3);
+        //  console.log("Vision API content: " + content);
+        const regex = /\\documentclass[\s\S]*?\\end{document}/;
+        const match = content.match(regex);
+
+        // If there is a match, return the matched LaTeX code
+        if (match) {
+          return match[0];
         }
-        content = content.substring(content.indexOf("\\documentclass"), content.indexOf("\\end{document}") + "\\end{document}".length);
-        return content;
       }
     
     return "";
