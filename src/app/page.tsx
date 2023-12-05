@@ -36,6 +36,9 @@ export default function Home() {
               // let newData = await callAssistant(data);
               let newData = await generateLatex(data, codeString);
               if (newData != codeString) {
+                if (newData === "API failed to generate...") {
+                  newData = await generateLatex(data, codeString);
+                }
                 setShowInput(false);
                 // const renderError = checkForRenderErrors(codeString);
                 // if (renderError !== null && renderError != undefined && renderError.message !== null && renderError.message !== undefined) {
@@ -125,6 +128,8 @@ export const generateLatex = async (userInput: string, prev: string): Promise<st
       if (match) {
         return match[0];
       }
+      else
+        return "API failed to generate...";
     }
     return prev;
   } catch (e) {
@@ -178,6 +183,8 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
         if (match) {
           return match[0];
         }
+        else
+         return "API failed to generate...";
       }
     
     return "";

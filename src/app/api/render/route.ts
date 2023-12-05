@@ -3,6 +3,8 @@ import latex from 'node-latex';
 import fs from 'fs';
 
 export async function POST(request: NextRequest) {
+    const path = "/Users/bhaveshvasnani/Projects/easytex/public/out.pdf";
+
     const body = await request.json();
     const input = body.input;
 
@@ -11,13 +13,13 @@ export async function POST(request: NextRequest) {
     const buffer = latex(input);
     console.log(buffer);
     try {
-        fs.unlinkSync('C:\\Users\\imtoo\\Documents\\StonyBrook\\Lectures\\AMS 691-02\\easytex\\public\\out.pdf');
+        fs.unlinkSync(path);
     } catch (e) {
 
     }
 
-    fs.writeFileSync('C:\\Users\\imtoo\\Documents\\StonyBrook\\Lectures\\AMS 691-02\\easytex\\public\\out.pdf', '');
-    const output = fs.createWriteStream('C:\\Users\\imtoo\\Documents\\StonyBrook\\Lectures\\AMS 691-02\\easytex\\public\\out.pdf');
+    fs.writeFileSync(path, '');
+    const output = fs.createWriteStream(path);
     try {
         const stream = buffer.pipe(output);
         await new Promise<void>((resolve, reject) => {

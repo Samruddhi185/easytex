@@ -71,6 +71,9 @@ export default function ChatContainer({ chatHistory, onChatInput, setCodeString,
                                 console.log("Base64 Encoded Image:", imageAsBase64);
                                 if (imageAsBase64) {
                                     let newData = await generateLatexFromImage(imageAsBase64?.toString());
+                                    if (newData === "API failed to generate...") {
+                                        newData = await generateLatexFromImage(imageAsBase64?.toString());
+                                    }
                                     console.log("Returned data from vision api: " + newData);
                                     setShowInput(false);
                                     await renderLatex(newData);

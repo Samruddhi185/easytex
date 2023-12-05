@@ -4,6 +4,7 @@ import fs from 'fs';
 import { Readable } from 'stream'
 
 export async function POST(request: NextRequest) {
+    const path = "/Users/bhaveshvasnani/Projects/easytex/public/out.pdf";
     // const body = await request.json();
     // const input = body.input;
     
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // output.close();
     
-    const buf = fs.readFileSync('C:\\Users\\imtoo\\Documents\\StonyBrook\\Lectures\\AMS 691-02\\easytex\\public\\out.pdf');
+    const buf = fs.readFileSync(path);
     console.log(buf, buf.byteLength);
     return new NextResponse(buf, {
         headers: {
