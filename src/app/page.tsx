@@ -120,7 +120,7 @@ export const generateLatex = async (userInput: string, prev: string): Promise<st
       
       const regex = /\\documentclass[\s\S]*?\\end{document}/;
       const match = content.match(regex);
-
+      console.log(content);
       // If there is a match, return the matched LaTeX code
       if (match) {
         return match[0];
