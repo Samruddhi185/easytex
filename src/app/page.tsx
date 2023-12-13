@@ -29,18 +29,23 @@ export default function Home() {
             setProgressVisibility={setProgressVisibility}
             showInput={showInput}
             setShowInput={setShowInput}
+            renderLatex={renderLatex}
             onChatInput={async (data: string) => {
               setChatHistory([...chatHistory, data]);
               setProgressVisibility(true);
               // let newData = await callAssistant(data);
-              let newData = await generateLatex(data, codeString);
+              let newData = await callAssistantAPI(data, codeString);
               if (newData != codeString) {
+                if (newData === "API failed to generate...") {
+                  newData = await callAssistantAPI(data, codeString);
+                }
                 setShowInput(false);
                 // const renderError = checkForRenderErrors(codeString);
                 // if (renderError !== null && renderError != undefined && renderError.message !== null && renderError.message !== undefined) {
                 //   console.log("render error was", renderError);
                 //   newData = await callAssistant(`There's a bug in the code with this error, make sure to remove any unnecessary packages or add missing characters - \"${renderError.message}\"`);
                 // }
+                await renderLatex(newData);
                 setCodeString(newData);
                 setProgressVisibility(false);
               }
@@ -81,12 +86,26 @@ const callAssistant = async(input: string): Promise<string> => {
   }
 }
 
-export const generateLatex = async (userInput: string, prev: string): Promise<string> => {
+const renderLatex = async(code: string): Promise<void> => {
+  console.log("CALLING RENDER LATEX");
+  await fetch('/api/render', {
+    method: 'POST', 
+    body: JSON.stringify({
+      input: code,
+    })
+  });
+}
+
+export const callAssistantAPI = async (userInput: string, prev: string): Promise<string> => {
   console.log("calling open ai");
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
       messages: [
-        { role: 'system', content: "You are a latex code generator, directed by the user's prompts. You must return the entire document after modifications. Make sure to import any packages when you use a command. Return only the latex code, and remove the backticks." },
+        { role: 'system', content: "You are a latex code generator, directed by the user's prompts.\
+ You must return the entire document after modifications.\
+ Make sure to import any packages when you use a command.\
+ Generate lorem ipsum or random text yourself instead of using the lipsum package.\
+ Return only the latex code, and remove the backticks." },
         {
           role: 'user', content: `The latex document you're working on is backticks below: 
           \`\`\`${prev}\`\`\`
@@ -103,11 +122,13 @@ export const generateLatex = async (userInput: string, prev: string): Promise<st
       
       const regex = /\\documentclass[\s\S]*?\\end{document}/;
       const match = content.match(regex);
-
+      console.log(content);
       // If there is a match, return the matched LaTeX code
       if (match) {
         return match[0];
       }
+      else
+        return "API failed to generate...";
     }
     return prev;
   } catch (e) {
@@ -161,6 +182,8 @@ export const generateLatexFromImage = async (imageAsBase64: string): Promise<str
         if (match) {
           return match[0];
         }
+        else
+         return "API failed to generate...";
       }
     
     return "";
