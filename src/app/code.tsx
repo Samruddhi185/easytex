@@ -12,7 +12,7 @@ export default function CodeContainer({ code, showProgress }: CodeProps) {
     return (
         <Card className="py-4 px-2 h-full" shadow="sm" >
             <CardHeader>
-                <h4>TeX code</h4>
+                <h4>LaTeX code</h4>
             </CardHeader>
             <CardBody className="h-full">
                 <div className='h-full'>

@@ -34,10 +34,10 @@ export default function Home() {
               setChatHistory([...chatHistory, data]);
               setProgressVisibility(true);
               // let newData = await callAssistant(data);
-              let newData = await generateLatex(data, codeString);
+              let newData = await callAssistantAPI(data, codeString);
               if (newData != codeString) {
                 if (newData === "API failed to generate...") {
-                  newData = await generateLatex(data, codeString);
+                  newData = await callAssistantAPI(data, codeString);
                 }
                 setShowInput(false);
                 // const renderError = checkForRenderErrors(codeString);
@@ -96,7 +96,7 @@ const renderLatex = async(code: string): Promise<void> => {
   });
 }
 
-export const generateLatex = async (userInput: string, prev: string): Promise<string> => {
+export const callAssistantAPI = async (userInput: string, prev: string): Promise<string> => {
   console.log("calling open ai");
   try {
     const { data: chatCompletion, response: raw } = await openai.chat.completions.create({
@@ -105,7 +105,6 @@ export const generateLatex = async (userInput: string, prev: string): Promise<st
  You must return the entire document after modifications.\
  Make sure to import any packages when you use a command.\
  Generate lorem ipsum or random text yourself instead of using the lipsum package.\
- Dont use \\equation tag for math formulae.\
  Return only the latex code, and remove the backticks." },
         {
           role: 'user', content: `The latex document you're working on is backticks below: 
